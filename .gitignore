@@ -1,0 +1,10 @@
+
+Archive/
+.vscode/
+
+AirQuality.db
+draft.ipynb
+
+*.pyc
+
+website_info.yaml

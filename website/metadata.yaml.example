@@ -1,0 +1,139 @@
+
+# Dataset metadata
+dataset_metadata:
+  # name(string) – the name of the new dataset, must be between 2 and 100 
+  # characters long and contain only lowercase alphanumeric characters,
+  # - and _, e.g. 'warandpeace'
+  name: 
+  
+  # title (string) – the title of the dataset (optional, default: same as name)
+  title: 
+
+  # private (bool) – If True creates a private dataset
+  private: 
+
+  # author (string) – the name of the dataset’s author (optional)
+  author: 
+
+  # author_email (string) – the email address of the dataset’s author (optional)
+  author_email: 
+
+  # maintainer (string) – the name of the dataset’s maintainer (optional)
+  maintainer: 
+
+  # maintainer_email (string) – the email address of the dataset’s maintainer (optional)
+  maintainer_email: 
+
+  # license_id (license id string) – the id of the dataset’s license, see 
+  # license_list() for available values (optional)
+  license_id: 
+
+  # url (string) – a URL for the dataset’s source (optional)
+  url: 
+
+  # groups (list of dictionaries) – the groups to which the dataset belongs
+  # (optional), each group dictionary should have one or more of the following 
+  # keys which identify an existing group: 'id' (the id of the group, string), 
+  # or 'name' (the name of the group, string), to see which groups exist call 
+  # group_list()
+  groups: 
+    - name: 
+
+  # owner_org (string) – the id of the dataset’s owning organization, see 
+  # organization_list() or organization_list_for_user() for available values. 
+  # This parameter can be made optional if the config option 
+  # ckan.auth.create_unowned_dataset is set to True.
+  owner_org: 
+
+  # tags (list of tag dictionaries) – the dataset’s tags, see tag_create() for 
+  # the format of tag dictionaries (optional)
+
+  # version (string, no longer than 100 characters) – (optional)
+
+  # notes (string) – a description of the dataset (optional)
+  # IMPORTANT: It can be saved as "dataset_notes.md" in the same folder as this file.
+
+  # state (string) – the current state of the dataset, e.g. 'active' or 'deleted', 
+  # only active datasets show up in search results and other lists of datasets, 
+  # this parameter will be ignored if you are not authorized to change the state 
+  # of the dataset (optional, default: 'active')
+
+  # type (string) – the type of the dataset (optional), IDatasetForm plugins 
+  # associate themselves with different dataset types and provide custom dataset 
+  # handling behaviour for these types
+
+  # extras (list of dataset extra dictionaries) – the dataset’s extras (optional), 
+  # extras are arbitrary (key: value) metadata items that can be added to datasets, 
+  # each extra dictionary should have keys 'key' (a string), 'value' (a string)
+
+  # resources (list of resource dictionaries) – the dataset’s resources, see 
+  # resource_create() for the format of resource dictionaries (optional)
+
+  # relationships_as_object (list of relationship dictionaries) – see 
+  # package_relationship_create() for the format of relationship dictionaries (optional)
+
+  # relationships_as_subject (list of relationship dictionaries) – see 
+  # package_relationship_create() for the format of relationship dictionaries (optional)
+
+  # plugin_data (dict) – private package data belonging to plugins. Only sysadmin 
+  # users may set this value. It should be a dict that can be dumped into JSON, 
+  # and plugins should namespace their data with the plugin name to avoid 
+  # collisions with other plugins, eg:
+  # {
+  #     "name": "test-dataset",
+  #     "plugin_data": {
+  #         "plugin1": {"key1": "value1"},
+  #         "plugin2": {"key2": "value2"}
+  #     }
+  # }
+
+# resurces:
+  # -
+    # aliases (list or comma separated string) – names for read only aliases of
+    # the resource. (optional)
+    # aliases:
+
+    # resource (dictionary) – resource dictionary that is passed to resource_create()
+    # resource:
+      # package_id (string) – id of package that the resource should be added to.
+      # package_id:
+
+      # name (string) – (optional)
+      # name:
+
+      # description (string) – (optional)
+      # description:
+
+      # fields (list of dictionaries) – fields/columns and their extra metadata. (optional)
+      # fields:
+        # -
+          # the column name (required)
+          # id:
+
+          # the data type for the column
+          # type:
+
+          # info:
+            # human-readable label for column
+            # label:
+
+            # markdown description of column
+            # notes:
+
+      # primary_key (list or comma separated string) – fields that represent a unique key (optional)
+
+      # indexes (list or comma separated string) – indexes on table (optional)
+
+# resurces:
+#   -
+#     aliases: []
+#     resource:
+#       package_id:
+#       name:
+#       description:
+#     fields:
+#       id:
+#       type:
+#       info:
+#         label:
+#         notes:
