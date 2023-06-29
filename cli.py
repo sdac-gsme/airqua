@@ -4,7 +4,37 @@ import argparse
 
 from src import Pollution, Ckan
 
-def create_sql_filter(input_args):
+
+def build_id_filter_query(input_args):
+    """Create a SQL filter condition based on the input arguments.
+
+    Args:
+        input_args (object): An object containing the input arguments.
+            - year (int): The year value.
+            - month (int or None): The month value (optional).
+            - day (int or None): The day value (optional).
+            - station (int or None): The station value (optional).
+
+    Returns:
+        str: The SQL filter condition as a string. The condition is constructed
+            based on the provided input arguments and follows the pattern:
+            "ID LIKE '{date_station}%'". Here, 'date_station' is a string formed
+            by concatenating the year, month, day, and station values in the format:
+            'YYYYMMDDSSS', where 'YYYY' represents the year, 'MM' represents the month
+            (padded with leading zeros if provided), 'DD' represents the day
+            (padded with leading zeros if provided), and 'SSS' represents the station
+            (padded with leading zeros if provided).
+
+    Example:
+        >>> args = {
+        ...     'year': 2023,
+        ...     'month': 6,
+        ...     'day': 15,
+        ...     'station': 123
+        ... }
+        >>> build_id_filter_query(args)
+        "ID LIKE '20230615123%'"
+    """
     date_station = str(input_args.year)
     if input_args.month is not None:
         date_station += f"{input_args.month:0>2}"
@@ -43,5 +73,5 @@ if __name__ == "__main__":
         )
         if args.ckan:
             ckan = Ckan()
-            filt = create_sql_filter(args)
+            filt = build_id_filter_query(args)
             ckan.add_recordes("Pollution", filt)
