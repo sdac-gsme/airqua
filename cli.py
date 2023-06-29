@@ -27,13 +27,13 @@ def build_id_filter_query(input_args):
 
     Example:
         >>> args = {
-        ...     'year': 2023,
+        ...     'year': 1401,
         ...     'month': 6,
         ...     'day': 15,
-        ...     'station': 123
+        ...     'station': 023
         ... }
         >>> build_id_filter_query(args)
-        "ID LIKE '20230615123%'"
+        "ID LIKE '14010615023%'"
     """
     date_station = str(input_args.year)
     if input_args.month is not None:
