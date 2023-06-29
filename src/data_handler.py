@@ -30,7 +30,8 @@ import pandas as pd
 import yaml
 
 
-engine = sa.create_engine('sqlite:///AirQuality.db')
+engine = sa.create_engine("sqlite:///AirQuality.db")
+
 
 def is_table_in_database(table_name):
     """Checks if a table exists in the database.
@@ -44,6 +45,7 @@ def is_table_in_database(table_name):
     metadata_obj = sa.MetaData()
     metadata_obj.reflect(engine)
     return table_name in metadata_obj.tables
+
 
 def create_table_stations():
     """Create Stations Table Schema
@@ -66,6 +68,7 @@ def create_table_stations():
         sa.Column("Date_of_Establishment", sa.String),
     )
     metadata_obj.create_all(engine)
+
 
 def create_table_pollution():
     """Create Pollution Table Schema
@@ -104,10 +107,12 @@ def create_table_pollution():
     )
     metadata_obj.create_all(engine)
 
+
 create_table = {
     "Stations": create_table_stations,
     "Pollution": create_table_pollution,
 }
+
 
 def upsert_results(table_name: str, table: pd.DataFrame):
     """Upsert Data into the Database
@@ -127,12 +132,13 @@ def upsert_results(table_name: str, table: pd.DataFrame):
     with engine.connect() as connection:
         ids = str(table.index.to_list()).replace("[", "(").replace("]", ")")
         connection.execute(sa.text(f"DELETE FROM {table_name} WHERE ID IN {ids}"))
-        connection.commit()
+        connection.commit()  # type: ignore
     table.to_sql(table_name, engine, if_exists="append", chunksize=10_000)
 
 
 class Ckan:
     """Class for interacting with the CKAN API."""
+
     database_name = "AirQuality.db"
 
     def __init__(self):
@@ -146,9 +152,14 @@ class Ckan:
         self.api_url = f"{website_info['address']}/api/3/action"
         self.header = {"X-CKAN-API-Key": website_info["token"]}
 
-        with open(Path().joinpath("website", "metadata.yaml"), encoding="utf-8") as yaml_file:
+        with open(
+            Path().joinpath("website", "metadata.yaml"), encoding="utf-8"
+        ) as yaml_file:
             self.website_metadata = yaml.load(yaml_file, yaml.CLoader)
-        with open(Path().joinpath("website", "dataset_notes.md"), encoding="utf-8") as text_file:
+
+        with open(
+            Path().joinpath("website", "dataset_notes.md"), encoding="utf-8"
+        ) as text_file:
             self.website_metadata["dataset_metadata"]["notes"] = text_file.read()
 
     def create_dataset(self):
@@ -258,12 +269,13 @@ class Ckan:
         )
         return response.json()
 
-    def add_recordes(self, table_name: str, filters : str | None = None):
+    def add_recordes(self, table_name: str, filters: str | None = None):
         """Add records to the specified resource.
 
         Args:
-            table_name (str): The name of the resource to add records to.
-            filters (str | None): Optional filters to apply when retrieving records. Defaults to None.
+            table_name (str): The name of the resource to add records to.    
+            filters (str | None): Optional filters to apply when retrieving records.
+            Defaults to None.
         """
         sql_statement = f"SELECT * FROM {table_name}"
         if filters is not None:
@@ -292,10 +304,10 @@ class Ckan:
         )
         while left_bound != right_bound:
             report_chunk = records[left_bound:right_bound]
-            pbar.update(right_bound-left_bound)
-            record_count =  right_bound == len(records)
+            pbar.update(right_bound - left_bound)
+            record_count = right_bound == len(records)
             left_bound = right_bound
-            right_bound = min(right_bound+chunk_size, len(records))
+            right_bound = min(right_bound + chunk_size, len(records))
             while True:
                 try:
                     self._upload_record_chunk(table_name, report_chunk, record_count)
@@ -306,7 +318,9 @@ class Ckan:
                     time.sleep(60)
         pbar.close()
 
-    def _upload_record_chunk(self, table_name, records, record_count: bool = False) -> None:
+    def _upload_record_chunk(
+        self, table_name: str, records: list[dict], record_count: bool = False
+    ) -> None:
         """Upload a chunk of records to the specified table/resource.
 
         Args:
@@ -323,7 +337,7 @@ class Ckan:
             json={
                 "resource_id": resource_id,
                 "records": records,
-                "calculate_record_count": str(record_count)
+                "calculate_record_count": str(record_count),
             },
             timeout=100,
         )

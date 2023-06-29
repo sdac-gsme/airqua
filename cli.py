@@ -51,11 +51,14 @@ def build_id_filter_query(input_args):
 
     return f"ID LIKE '{date_station}%'"
 
+
 pollution = Pollution()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("command", choices=["pollution", "stations"])
-parser.add_argument("-c", "--ckan", action="store_true", help="Upload data to Ckan", default=False)
+parser.add_argument(
+    "-c", "--ckan", action="store_true", help="Upload data to Ckan", default=False
+)
 parser.add_argument("-y", "--year", default=None)
 parser.add_argument("-m", "--month", default=None)
 parser.add_argument("-d", "--day", default=None)

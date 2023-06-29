@@ -40,29 +40,30 @@ from . import data_handler
 class _AirNow:
     """A class for retrieving and managing air quality data from the AirNow website.
 
-        This class provides methods for retrieving station information, pollution data,
-        and upserting the data into a database's "Pollution" table.
+    This class provides methods for retrieving station information, pollution data,
+    and upserting the data into a database's "Pollution" table.
     """
+
     _headers = {
-        'Accept': (
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,'
-            'image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,"
+            "image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
         ),
-        'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8,fa;q=0.7',
-        'Cache-Control': 'max-age=0',
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Origin': 'http://airnow.tehran.ir',
-        'Referer': 'http://airnow.tehran.ir/',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': (
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+        "Accept-Language": "en-US,en;q=0.9,ar;q=0.8,fa;q=0.7",
+        "Cache-Control": "max-age=0",
+        "Connection": "keep-alive",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Origin": "http://airnow.tehran.ir",
+        "Referer": "http://airnow.tehran.ir/",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
         ),
     }
 
     _data = {
-        'ctl00$ContentPlaceHolder1$btnSearch': '  نمایش   ',
+        "ctl00$ContentPlaceHolder1$btnSearch": "  نمایش   ",
     }
 
     url = "http://airnow.tehran.ir/home/DataArchive.aspx"
@@ -91,11 +92,11 @@ class _AirNow:
     def get_station_ids() -> dict:
         """Retrieve the station IDs and names.
 
-        Makes a request to the AirNow website to fetch the available station IDs 
+        Makes a request to the AirNow website to fetch the available station IDs
         and their corresponding names.
-        
+
         Returns:
-            dict: A dictionary containing the station IDs as keys and the 
+            dict: A dictionary containing the station IDs as keys and the
             corresponding names as values.
 
         Example:
@@ -123,20 +124,22 @@ class _AirNow:
     def _extract_table(response) -> pd.DataFrame:
         soup = BeautifulSoup(response.content, "html.parser")
         table_html = soup.find("table")
-        table = pd.DataFrame([
-            [cell.text for cell in row.find_all(["th", "td"])]
-            for row in table_html.find_all("tr") # type: ignore
-        ])
+        table = pd.DataFrame(
+            [
+                [cell.text for cell in row.find_all(["th", "td"])]
+                for row in table_html.find_all("tr")  # type: ignore
+            ]
+        )
         return table
 
-    def get_stations_info(self) ->pd.DataFrame:
+    def get_stations_info(self) -> pd.DataFrame:
         """Retrieve basic information about stations.
-        
-        Retrieves the date of establishment and district for each station from the specified URL 
+
+        Retrieves the date of establishment and district for each station from the specified URL
         and merges it with the station ID. Returns the resulting dataframe.
-        
+
         Returns:
-            pandas.DataFrame: Dataframe containing the station ID, station name, district, 
+            pandas.DataFrame: Dataframe containing the station ID, station name, district,
             and date of establishment.
         """
         url = "http://airnow.tehran.ir/home/stationInfo.aspx"
@@ -146,10 +149,10 @@ class _AirNow:
         table = table.iloc[1:]
         table.columns = ["Station", "District", "Date_of_Establishment"]
         station_ids = {
-            station_name: int(station_id) for
-            station_id, station_name in self.stations.items()
+            station_name: int(station_id)
+            for station_id, station_name in self.stations.items()
         }
-        table.index = table["Station"].map(station_ids) # type: ignore
+        table.index = table["Station"].map(station_ids)  # type: ignore
         table.index.name = "ID"
         data_handler.upsert_results("Stations", table)
         return table
@@ -171,6 +174,7 @@ class Pollution(_AirNow):
         data = pollution.get_data(year=1401, month=6)
         print(data)
     """
+
     url = "http://airnow.tehran.ir/home/DataArchive.aspx"
 
     def __init__(self):
@@ -233,7 +237,7 @@ class Pollution(_AirNow):
         Note:
             - If only the year parameter is provided, data for the entire year is returned.
             - If the year and month parameters are provided, data for the entire month is returned.
-            - If the year, month, and day parameters are provided, data for the specific 
+            - If the year, month, and day parameters are provided, data for the specific
             day is returned.
             - If all parameters are provided, data for the specified station and day is returned.
             - The resulting data is cleaned using the _clean_output_table method.
@@ -281,12 +285,12 @@ class Pollution(_AirNow):
             year (int): The year of the desired data.
 
         Returns:
-            pandas.DataFrame or None: DataFrame containing the combined hourly data for all 
+            pandas.DataFrame or None: DataFrame containing the combined hourly data for all
             stations in the specified year.
                 Returns None if no data is available.
 
         Note:
-            The function utilizes the get_data_by_month method to retrieve data for each month 
+            The function utilizes the get_data_by_month method to retrieve data for each month
             of the specified year.
             If no data is available for any month or day or station, None is returned.
             The resulting data is concatenated into a single DataFrame.
@@ -296,7 +300,7 @@ class Pollution(_AirNow):
             >>> data = get_data_by_year(1402)
         """
         month_tables = []
-        for month in range(1, 12+1):
+        for month in range(1, 12 + 1):
             month_table = self.get_data_by_month(year, month)
             if month_table is None:
                 continue
@@ -317,14 +321,14 @@ class Pollution(_AirNow):
             month (int): The month of the desired data.
 
         Returns:
-            pandas.DataFrame or None: DataFrame containing the combined hourly data 
+            pandas.DataFrame or None: DataFrame containing the combined hourly data
             for all stations in the specified month.
                 Returns None if no data is available.
 
         Note:
-            The function utilizes the get_data_by_day method to retrieve data for 
+            The function utilizes the get_data_by_day method to retrieve data for
             each day of the specified month.
-            The maximum number of days in a month is determined based on the 
+            The maximum number of days in a month is determined based on the
             specified year and month.
             If no data is available for any day or station, None is returned.
             The resulting data is concatenated into a single DataFrame.
@@ -335,13 +339,13 @@ class Pollution(_AirNow):
         """
         if month <= 6:
             max_day = 31
-        elif (month <= 11) or (year%33 in [1, 5, 9, 13, 17, 22, 26, 30]):
+        elif (month <= 11) or (year % 33 in [1, 5, 9, 13, 17, 22, 26, 30]):
             max_day = 30
         else:
             max_day = 29
 
         day_tables = []
-        for day in range(1, max_day+1):
+        for day in range(1, max_day + 1):
             day_table = self.get_data_by_day(year, month, day)
             if day_table is None:
                 continue
@@ -363,13 +367,13 @@ class Pollution(_AirNow):
             day (int): The day of the desired data.
 
         Returns:
-            pandas.DataFrame: Dataframe containing the combined hourly data for 
+            pandas.DataFrame: Dataframe containing the combined hourly data for
             all stations on the specified day.
 
         Note:
-            The function relies on the get_data_by_station and get_stations_info 
+            The function relies on the get_data_by_station and get_stations_info
             methods to retrieve the data for each station.
-            Only stations with a date of establishment on or before the specified 
+            Only stations with a date of establishment on or before the specified
             day will be considered.
             If no data is available for any station, None is returned.
             The resulting data is concatenated into a single DataFrame.
@@ -395,7 +399,7 @@ class Pollution(_AirNow):
         table = pd.concat(station_tables, ignore_index=True)
         return table
 
-    def get_data_by_station(self, year, month, day, station, **kwargs) ->pd.DataFrame:
+    def get_data_by_station(self, year, month, day, station, **kwargs) -> pd.DataFrame:
         """Retrieve data for a specific station on a given date.
 
         Retrieves hourly data for the specified station on the specified date,
@@ -409,7 +413,7 @@ class Pollution(_AirNow):
             **kwargs: Additional keyword arguments for customization.
 
         Returns:
-            pandas.DataFrame: Dataframe containing the hourly data for the 
+            pandas.DataFrame: Dataframe containing the hourly data for the
             specified station and date.
 
         Note:
@@ -430,20 +434,22 @@ class Pollution(_AirNow):
     def _request_hourly_data(self, station, date, time_unit="hour", decimal_numbers=2):
         decimal_numbers = str(decimal_numbers)
         staion_date = {
-            'ctl00$ContentPlaceHolder1$ddlStation': station,
-            'ctl00$ContentPlaceHolder1$pddFrom': date,
-            'ctl00$ContentPlaceHolder1$pddTo': date,
-            'ctl00$ContentPlaceHolder1$ddlReportType': time_unit,
-            'ctl00$ContentPlaceHolder1$txtNumber': decimal_numbers,
+            "ctl00$ContentPlaceHolder1$ddlStation": station,
+            "ctl00$ContentPlaceHolder1$pddFrom": date,
+            "ctl00$ContentPlaceHolder1$pddTo": date,
+            "ctl00$ContentPlaceHolder1$ddlReportType": time_unit,
+            "ctl00$ContentPlaceHolder1$txtNumber": decimal_numbers,
         }
         self._data.update(staion_date)
-        response = requests.post(self.url, data=self._data, headers=self._headers, timeout=100)
+        response = requests.post(
+            self.url, data=self._data, headers=self._headers, timeout=100
+        )
         return response
 
     @staticmethod
     def _clean_input_table(table: pd.DataFrame):
         table.columns = table.iloc[0]
-        columns_renamer ={
+        columns_renamer = {
             "ایستگاه": "Station",
             "ساعت": "Hour",
             "تاریخ": "Date",
@@ -455,18 +461,19 @@ class Pollution(_AirNow):
 
     def _clean_output_table(self, table):
         station_ids = {
-            station_name: int(station_id) for
-            station_id, station_name in self.stations.items()
+            station_name: int(station_id)
+            for station_id, station_name in self.stations.items()
         }
         table["Station"] = table["Station"].map(station_ids)
         table["Hour"] = table["Hour"].astype("int")
 
         table.index = table.apply(
             lambda row: f"{row.Date.replace('/', '')}{row.Hour:0>2}{str(row.Station):0>3}",
-            axis="columns"
+            axis="columns",
         )
         table.index.name = "ID"
-        table = table[["Date", "Hour", "Station"] + table.columns[1:-2].to_list()]
+        table = table[["Date", "Hour", "Station"] +
+                      table.columns[1:-2].to_list()]
 
         new_values = table[table.columns[3:]].copy()
         new_values = new_values.applymap(lambda cell: cell.replace("/", "."))
