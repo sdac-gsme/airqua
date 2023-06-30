@@ -34,7 +34,7 @@ import requests
 from bs4 import BeautifulSoup, Tag
 import pandas as pd
 
-from . import data_handler
+from .data_handler import DatabaseManager
 
 
 class _AirNow:
@@ -154,7 +154,8 @@ class _AirNow:
         }
         table.index = table["Station"].map(station_ids)  # type: ignore
         table.index.name = "ID"
-        data_handler.upsert_results("Stations", table)
+        dbman = DatabaseManager()
+        dbman.upsert_results("Stations", table)
         return table
 
 
@@ -216,7 +217,8 @@ class Pollution(_AirNow):
             >>> upsert_data(year=2023, month=6, day=23, station="ABC123")
         """
         data = self.get_data(year, month, day, station)
-        data_handler.upsert_results("Pollution", data)
+        dbman = DatabaseManager()
+        dbman.upsert_results("Pollution", data)
 
     def get_data(self, year=None, month=None, day=None, station=None) -> pd.DataFrame:
         """Retrieve data based on specified parameters.
