@@ -57,10 +57,12 @@ class DatabaseManager:
 
     def __init__(self) -> None:
         self.engine = sa.create_engine("sqlite:///AirQuality.db")
-        self.create_table = {
-            "Stations": self.create_table_stations,
-            "Pollution": self.create_table_pollution,
-        }
+        for table_name, function in (
+            ("Stations", self.create_table_stations),
+            ("Pollution", self.create_table_pollution),
+        ):
+            if not self.is_table_in_database(table_name):
+                function()
 
     def is_table_in_database(self, table_name: str):
         """Checks if a table exists in the database.
@@ -149,8 +151,6 @@ class DatabaseManager:
             table_name (str): Name of the table.
             table (pd.DataFrame): Data to be upserted, stored as a Pandas DataFrame.
         """
-        if not self.is_table_in_database(table_name):
-            self.create_table[table_name]()
         with self.engine.connect() as connection:
             ids = str(table.index.to_list()).replace(
                 "[", "(").replace("]", ")")
