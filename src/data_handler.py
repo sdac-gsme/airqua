@@ -326,7 +326,7 @@ class Ckan:
         )
         return response.json()
 
-    def add_recordes(self, table_name: str, filters: str | None = None):
+    def add_recordes_from_database(self, table_name: str, filters: str | dict | None = None):
         """Add records to the specified resource.
 
         Args:

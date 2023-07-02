@@ -77,4 +77,4 @@ if __name__ == "__main__":
         if args.ckan:
             ckan = Ckan()
             filt = build_id_filter_query(args)
-            ckan.add_recordes("Pollution", filt)
+            ckan.add_recordes_from_database("Pollution", filt)
