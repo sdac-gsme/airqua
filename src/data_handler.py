@@ -160,7 +160,7 @@ class DatabaseManager:
         table.to_sql(table_name, self.engine,
                      if_exists="append", chunksize=10_000)
 
-    def get_data(self, table_name: str, filters: str | None = None) -> pd.DataFrame:
+    def get_data(self, table_name: str, filters: str | dict | None = None) -> pd.DataFrame:
         """
         Retrieve data from the specified table in the database.
 
@@ -184,12 +184,54 @@ class DatabaseManager:
             stations_data = db_manager.get_data("Pollution", filters)
         """
         sql_statement = f"SELECT * FROM {table_name}"
+        if isinstance(filters, dict):
+            filters = self.build_id_filter_query(**filters)
         if filters is not None:
             sql_statement += f" WHERE {filters}"
         sql_statement = sa.text(sql_statement)
         with self.engine.connect() as connection:
             table = pd.read_sql(sql_statement, connection)
         return table
+
+    @staticmethod
+    def build_id_filter_query(year=None, month=None, day=None, station=None) -> str:
+        """
+        Build a filter query for an ID based on the provided year, month, day, and station values.
+
+        Args:
+            year (int, optional): Year value for the ID. Defaults to None.
+            month (int, optional): Month value for the ID. Defaults to None.
+            day (int, optional): Day value for the ID. Defaults to None.
+            station (int, optional): Station value for the ID. Defaults to None.
+
+        Returns:
+            str: Filter query string based on the provided values. The format of the
+                query is "ID LIKE '{id_pattern}%'". The placeholders {id_pattern} will be
+                replaced with the concatenated values of year, month, day, and station.
+                Missing values will be replaced with underscores (_) in the query.
+
+        Example:
+            query = build_id_filter_query(year=1401, month=7, station=123)
+            # Returns: "ID LIKE '140107__123%'"
+        """
+        if year is not None:
+            id_pattern = str(year)
+        else:
+            id_pattern = "____"
+        if month is not None:
+            id_pattern += f"{month:0>2}"
+        else:
+            id_pattern += "__"
+        if day is not None:
+            id_pattern += f"{day:0>2}"
+        else:
+            id_pattern += "__"
+        if station is not None:
+            id_pattern += f"{station:0>3}"
+        else:
+            id_pattern += "___"
+
+        return f"ID LIKE '{id_pattern}%'"
 
 
 class Ckan:
