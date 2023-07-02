@@ -13,6 +13,8 @@ tqdm = "^4.65.0"
 PyYAML = "^6.0"
 bs4 = "^0.0.1"
 sqlalchemy = "^2.0.17"
+schedule = "^1.2.0"
+jdatetime = "^4.1.1"
 
 
 [build-system]
