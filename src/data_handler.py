@@ -107,7 +107,7 @@ class DatabaseManager:
         - ID: Unique identifier for the data entry (string, primary key)
         - Date: Date of the pollution data (string)
         - Hour: Hour of the pollution data (integer)
-        - Station: ID of the monitoring station (integer, foreign key)
+        - Station: ID of the monitoring station (integer)
         - CO: Carbon monoxide level (float)
         - O3: Ozone level (float)
         - NO: Nitric oxide level (float)
@@ -124,9 +124,7 @@ class DatabaseManager:
             sa.Column("ID", sa.String, primary_key=True),
             sa.Column("Date", sa.String),
             sa.Column("Hour", sa.Integer),
-            sa.Column(
-                "Station", sa.Integer, sa.ForeignKey("Stations.ID"), nullable=False
-            ),
+            sa.Column("Station", sa.Integer),
             sa.Column("CO", sa.Float),
             sa.Column("O3", sa.Float),
             sa.Column("NO", sa.Float),
