@@ -1,0 +1,9 @@
+
+Archive/
+.vscode/
+.venv/
+
+AirQuality.db
+draft.ipynb
+
+*.pyc
