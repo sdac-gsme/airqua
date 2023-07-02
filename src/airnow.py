@@ -182,7 +182,7 @@ class Pollution(_AirNow):
         super().__init__()
         self._headers["Referer"] = "http://airnow.tehran.ir/home/DataArchive.aspx"
 
-    def upsert_data(self, year=None, month=None, day=None, station=None) -> None:
+    def upsert_data(self, year, month=None, day=None, station=None) -> None:
         """Upsert pollution data into the database's "Pollution" table.
 
         Retrieves pollution data based on specified parameters (year, month, day,
@@ -220,7 +220,7 @@ class Pollution(_AirNow):
         dbman = DatabaseManager()
         dbman.upsert_results("Pollution", data)
 
-    def get_data(self, year=None, month=None, day=None, station=None) -> pd.DataFrame:
+    def get_data(self, year, month=None, day=None, station=None) -> pd.DataFrame:
         """Retrieve data based on specified parameters.
 
         Retrieves the hourly data based on the specified parameters and returns
