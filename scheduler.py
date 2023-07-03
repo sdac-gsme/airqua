@@ -15,6 +15,17 @@ RUN_URL = "https://healthchecks.sdac.ir/ping/2fec9b55-c6f5-4cdd-9658-e8d9f5b0190
 DATA_FLOW_URL = "https://healthchecks.sdac.ir/ping/b0795427-d744-4dc4-b8cf-2355e5441843"
 
 
+def ping(url, retry=3):
+    """Ping"""
+    for _ in range(retry):
+        try:
+            requests.get(url, timeout=100)
+            return True
+        except requests.exceptions.ReadTimeout:
+            time.sleep(10)
+    return False
+
+
 def get_and_upload_data(day: datetime):
     """Get and Upload data"""
     pollution = Pollution()
@@ -38,7 +49,7 @@ def hourly_update():
     else:
         selected_day = today - jdatetime.timedelta(days=1)
     get_and_upload_data(selected_day) # type: ignore
-    requests.get(DATA_FLOW_URL, timeout=10)
+    ping(DATA_FLOW_URL)
 
 
 def daily_update():
@@ -56,5 +67,5 @@ if __name__ == "__main__":
     schedule.run_all()
     while True:
         schedule.run_pending()
-        requests.get(RUN_URL, timeout=10)
+        ping(RUN_URL)
         time.sleep(30)
