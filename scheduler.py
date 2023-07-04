@@ -39,8 +39,10 @@ def get_and_upload_data(day: datetime):
     for _ in range(3):
         try:
             pollution = Pollution()
+            print(f"data for date {day_dict} received successfully")
             pollution.upsert_data(**day_dict)
-        except requests.exceptions.ReadTimeout:
+        except requests.exceptions.ReadTimeout as exception:
+            print(exception)
             time.sleep(300)
         else:
             ckan.add_recordes_from_database("Pollution", day_dict)
