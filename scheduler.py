@@ -15,8 +15,10 @@ RUN_URL = "https://healthchecks.sdac.ir/ping/2fec9b55-c6f5-4cdd-9658-e8d9f5b0190
 DATA_FLOW_URL = "https://healthchecks.sdac.ir/ping/b0795427-d744-4dc4-b8cf-2355e5441843"
 
 
-def ping(url, retry=3):
+def ping(url: str, state: str | None = None, retry: int =3):
     """Ping"""
+    if state is not None:
+        url += f"/{state}"
     for _ in range(retry):
         try:
             requests.get(url, timeout=100)
@@ -28,28 +30,38 @@ def ping(url, retry=3):
 
 def get_and_upload_data(day: datetime):
     """Get and Upload data"""
-    pollution = Pollution()
     ckan = Ckan()
     day_dict = {
         "year": day.year,
         "month": day.month,
         "day": day.day,
     }
-    pollution.upsert_data(**day_dict)
-    ckan.add_recordes_from_database("Pollution", day_dict)
+    for _ in range(3):
+        try:
+            pollution = Pollution()
+            pollution.upsert_data(**day_dict)
+        except requests.exceptions.ReadTimeout:
+            time.sleep(300)
+        else:
+            ckan.add_recordes_from_database("Pollution", day_dict)
+            return True
+    return False
 
 
 def hourly_update():
     """Hourly update
     """
-    requests.get(f"{DATA_FLOW_URL}/start", timeout=10)
+    ping(DATA_FLOW_URL, "start")
     today = jdatetime.datetime.today()
     if today.hour > 0:
         selected_day = today
     else:
         selected_day = today - jdatetime.timedelta(days=1)
-    get_and_upload_data(selected_day) # type: ignore
-    ping(DATA_FLOW_URL)
+    success = get_and_upload_data(selected_day) # type: ignore
+    if success:
+        ping(DATA_FLOW_URL)
+    else:
+        ping(DATA_FLOW_URL, "fail")
 
 
 def daily_update():
