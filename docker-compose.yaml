@@ -1,0 +1,7 @@
+version: '3'
+services:
+  airqua:
+    build: .
+    image: airqua:latest
+    container_name: airqua
+    restart: unless-stopped
